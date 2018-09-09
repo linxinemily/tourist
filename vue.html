@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="main.css">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+
+  <title>Document</title>
+</head>
+<body>
+    <div id="app">
+        <header class="text-center d-flex justify-content-center align-items-center">
+            <h1>高雄旅遊資訊網</h1>
+            <select name="areas" id="areas" v-model="currentArea">
+                <option v-for="area in areas" :value="area">{{ area }}</option>
+            </select>
+            <div class="btns-group mt-2">
+            <p>熱門行政區</p>
+            <input @click="currentArea = area" v-for="area in areas" :value="area" type="button" :value="area" class="btn" >
+            </div>
+        </header>
+        <section class="container mt-4 content">
+            <h3 class="title text-center">{{ currentArea }}</h3>
+        
+            
+            <div class="row list">
+                <div class="col-md-6" v-for="spot in filteredSpots">
+                    <div class="card">
+                        <div class="top" :style="{ background: 'url('+ spot.Picture1 +')' }">
+                            <div class="title">{{ spot.Name }}</div>
+                        </div>
+                        <div class="bottom">
+                            <p><i class="fa fa-clock-o" aria-hidden="true"></i>{{ spot.Opentime }}</p>
+                            <p><i class="fa fa-map-marker" aria-hidden="true"></i>{{ spot.Add }}</p>
+                            <p><i class="fa fa-phone" aria-hidden="true"></i> {{ spot.Tel }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            
+        </section>
+    </div>
+  <footer class="text-center">©2018 高雄旅遊網<br>資料來源：高雄市政府
+    
+  </footer>
+
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script>
+      new Vue({
+          el: '#app',
+          data () {
+              return {
+                  areas: [
+                    '苓雅區',
+                    '三民區',
+                    '新興區',
+                    '鹽埕區'
+                  ],
+                  currentArea: '',
+                  spots: []
+              }
+          },
+          mounted () { //資料準備好後執行
+              axios.get('/data.json')
+                .then((response) => {
+                    this.spots = response.data
+                })
+          },
+          computed: { //計算過後的變數
+              filteredSpots () {
+                  let selected = []
+                  for (let spot of this.spots) {
+                      if (spot.Zone === this.currentArea) {
+                          selected.push(spot)
+                      }
+                  }
+                  return selected
+              }
+          }
+      })
+  </script>
+</body>
+</html>
